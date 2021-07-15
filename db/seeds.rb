@@ -22,3 +22,8 @@ User.create(
     last_name: 'last_name_2',
     password: '123'
 )
+
+User.create(
+    user_name: 'user_name_without_any_other', 
+    password: '123'
+)
