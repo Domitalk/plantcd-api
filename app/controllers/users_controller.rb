@@ -1,9 +1,19 @@
 class UsersController < ApplicationController
-    skip_before_action :verify_authenticity_token
+    skip_before_action :authorized, only: [:create, :show, :update]
+
+    def profile
+        render json: { user: user_logged_in }, status: :accepted
+    end
 
     def create 
         @user = User.create(user_params)
-        render json: @user
+
+        if @user.valid?
+            @token = encode_token(user_id: @user.id)
+            render json: { user: @user, jwt: @token }, status: :created
+        else
+            render json: { error: 'failed to create user' }, status: :not_acceptable
+        end
     end 
 
     def show 
@@ -18,6 +28,6 @@ class UsersController < ApplicationController
 
     private 
     def user_params 
-        params.permit(:user_name, :first_name, :middle_name, :last_name, :password)
+        params.require(:user).permit(:user_name, :first_name, :middle_name, :last_name, :password)
     end 
 end 
